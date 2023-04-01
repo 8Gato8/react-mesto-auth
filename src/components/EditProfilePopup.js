@@ -57,7 +57,6 @@ function EditProfilePopup({
 						id="input-name"
 						className="form__input"
 						value={name}
-						ref={nameInput}
 						placeholder="Имя"
 						type="text"
 						name="name"
@@ -76,7 +75,6 @@ function EditProfilePopup({
 						id="input-job"
 						className="form__input"
 						value={description}
-						ref={descriptionInput}
 						placeholder="О себе"
 						type="text"
 						name="job"

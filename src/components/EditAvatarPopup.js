@@ -49,7 +49,6 @@ function EditAvatarPopup({
 						id="input-avatar-link"
 						className="form__input"
 						value={avatar}
-						ref={avatarInput}
 						placeholder="Ссылка на новый аватар"
 						type="url"
 						name="avatar"

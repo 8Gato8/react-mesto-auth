@@ -56,7 +56,6 @@ function AddPlacePopup({
 						id="input-place-name"
 						className="form__input"
 						value={name}
-						ref={nameInput}
 						placeholder="Название"
 						type="text"
 						name="name"
@@ -75,7 +74,6 @@ function AddPlacePopup({
 						id="input-place-link"
 						className="form__input"
 						value={link}
-						ref={linkInput}
 						placeholder="Ссылка на картинку"
 						type="url"
 						name="link"
