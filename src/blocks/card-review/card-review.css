@@ -1,0 +1,10 @@
+.card-review {
+  font-family: 'Inter';
+  font-style: normal;
+  margin: auto;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  row-gap: 10px;
+  justify-content: space-between;
+}

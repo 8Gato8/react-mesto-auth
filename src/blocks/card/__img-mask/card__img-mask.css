@@ -1,0 +1,5 @@
+.card__img-mask {
+  background-color: #000;
+  height: 282px;
+  grid-column: 1 / 3;
+}

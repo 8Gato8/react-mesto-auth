@@ -1,0 +1,15 @@
+.page__content {
+  min-height: 75vh;
+}
+
+@media (max-width: 768px) {
+  .page__content {
+    padding: 0 30px;
+  }
+}
+
+@media (max-width: 398px) {
+  .page__content {
+    padding: 0 20px;
+  }
+}

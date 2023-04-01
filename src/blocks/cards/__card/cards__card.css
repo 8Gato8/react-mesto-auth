@@ -1,0 +1,6 @@
+.cards__card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 60px;
+  border-radius: 10px;
+}

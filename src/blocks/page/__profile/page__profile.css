@@ -1,0 +1,17 @@
+.page__profile {
+  display: flex;
+  align-items: center;
+  margin-bottom: 50px;
+}
+
+@media (max-width: 768px) {
+  .page__profile {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 398px) {
+  .page__profile {
+    margin-bottom: 36px;
+  }
+}

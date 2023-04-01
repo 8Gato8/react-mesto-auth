@@ -1,0 +1,19 @@
+.page__container {
+  max-width: 880px;
+  padding: 45px 50px 60px;
+  min-height: 100vh;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .page__container {
+    padding-right: 0;
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 398px) {
+  .page__container {
+    padding: 28px 0 36px;
+  }
+}
