@@ -3,3 +3,10 @@
 	background-color: #000;
 	border-bottom: 2px solid rgba(204, 204, 204, 1);
 }
+
+.form__input_theme_dark:-webkit-autofill,
+.form__input_theme_dark:hover,
+.form__input_theme_dark:focus {
+	-webkit-text-fill-color: #fff;
+	-webkit-box-shadow: 0 0 0px 1000px #000 inset;
+}

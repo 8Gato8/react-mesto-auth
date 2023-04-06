@@ -197,7 +197,7 @@ function App() {
       .catch((err) => {
         console.log(err);
       });
-  }, [])
+  }, [currentUser])
 
   const closeAllPopups = React.useCallback(function () {
 
@@ -228,7 +228,7 @@ function App() {
     } finally {
       setEditProfilePopupSubmitButtonText('Сохранить')
     }
-  }, [])
+  }, [closeAllPopups])
 
   const handleUpdateAvatar = React.useCallback(async function ({ avatar }) {
 
@@ -249,7 +249,7 @@ function App() {
       setEditAvatarPopupSubmitButtonText('Сохранить')
     }
 
-  }, [])
+  }, [closeAllPopups])
 
   const handleAddPlaceSubmit = React.useCallback(async function ({ name, link }) {
 
@@ -270,7 +270,7 @@ function App() {
       setAddPlacePopupSubmitButtonText('Создать');
     }
 
-  }, [cards])
+  }, [cards, closeAllPopups])
 
   const handleDeleteConfirmation = React.useCallback(function (card) {
 
@@ -289,7 +289,7 @@ function App() {
       .finally(() => {
         setConfirmationPopupSubmitButtonText('Да')
       });
-  }, [])
+  }, [closeAllPopups])
 
   if (loading) {
     return (
