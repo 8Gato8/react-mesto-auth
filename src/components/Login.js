@@ -1,9 +1,6 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { IsLoggedInContext } from "../contexts/IsLoggedInContext";
-import InfoTooltip from './InfoTooltip';
-
-import regFailure from '../images/regFailure.jpg';
 
 function Login({
 	setUserData,
@@ -18,8 +15,6 @@ function Login({
 	}, [onRender])
 
 	const isLoggedIn = React.useContext(IsLoggedInContext);
-	const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
-	const [tooltipContent, setTooltipContent] = React.useState({ title: '', src: '' });
 
 	const [formValues, setFormValues] = React.useState({
 		email: '',
@@ -39,24 +34,10 @@ function Login({
 
 	async function handleSubmit(e) {
 
-		try {
+		e.preventDefault();
 
-			e.preventDefault();
-
-			await onLogin(formValues);
-			setUserData(formValues);
-
-		} catch (err) {
-
-			setTooltipContent({
-				title: 'Что-то пошло не так! Попробуйте ещё раз.',
-				src: regFailure
-			});
-
-			setIsInfoTooltipOpen(true);
-
-			console.log(err);
-		}
+		await onLogin(formValues);
+		setUserData(formValues);
 
 	}
 
@@ -114,8 +95,6 @@ function Login({
 				</form>
 
 			</div>
-
-			<InfoTooltip isOpen={isInfoTooltipOpen} tooltipContent={tooltipContent} onOpen={setIsInfoTooltipOpen} onClose={setTooltipContent} />
 		</>
 	)
 }

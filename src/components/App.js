@@ -6,6 +6,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import api from '../utils/api';
 import * as auth from "../utils/auth";
 
+import regSuccess from '../images/regSuccess.jpg';
+import regFailure from '../images/regFailure.jpg';
+
 import { IsLoggedInContext } from '../contexts/IsLoggedInContext';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import { UserDataContext } from '../contexts/UserDataContext';
@@ -24,6 +27,7 @@ import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
 import ConfirmationPopup from './ConfirmationPopup';
 import ImagePopup from './ImagePopup';
+import InfoTooltip from './InfoTooltip';
 
 import Footer from './Footer';
 
@@ -33,9 +37,11 @@ function App() {
 
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [userData, setUserData] = React.useState({ email: '', password: '' })
-  const [loading, setLoading] = React.useState(true);
 
-  const [currentPath, setCurrentPath] = React.useState();
+  const [isAuthorizing, setIsAuthorizing] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
+
+  const [currentPath, setCurrentPath] = React.useState('');
 
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
@@ -43,18 +49,32 @@ function App() {
   const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] = React.useState(false);
   const [isImagePopupOpen, setIsImagePopupOpen] = React.useState(false);
 
+  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
+  const [tooltipContent, setTooltipContent] = React.useState({ title: '', src: '' });
+
   const [selectedCard, setSelectedCard] = React.useState({ title: '', name: '', link: '' });
 
   const [currentUser, setCurrentUser] = React.useState({ name: '', about: '' });
 
   const [cards, setCards] = React.useState([]);
 
-  const [registerSubmitButtonText, setRegisterSubmitButtonText] = React.useState('Зарегистрироваться');
-  const [loginSubmitButtonText, setLoginSubmitButtonText] = React.useState('Войти');
-  const [editProfilePopupSubmitButtonText, setEditProfilePopupSubmitButtonText] = React.useState('Сохранить');
-  const [editAvatarPopupSubmitButtonText, setEditAvatarPopupSubmitButtonText] = React.useState('Сохранить');
-  const [addPlacePopupSubmitButtonText, setAddPlacePopupSubmitButtonText] = React.useState('Создать');
-  const [confirmationPopupSubmitButtonText, setConfirmationPopupSubmitButtonText] = React.useState('Да');
+  const isOpen = isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || isImagePopupOpen;
+
+  React.useEffect(() => {
+
+    function closeByEscape(evt) {
+      if (evt.key === 'Escape') {
+        closeAllPopups();
+      }
+    }
+
+    if (isOpen) { // навешиваем только при открытии
+      document.addEventListener('keydown', closeByEscape);
+      return () => {
+        document.removeEventListener('keydown', closeByEscape);
+      }
+    }
+  }, [isOpen])
 
   React.useEffect(() => {
 
@@ -88,7 +108,8 @@ function App() {
 
     try {
 
-      setLoginSubmitButtonText('Вход...')
+      setLoading(true);
+
       const data = await auth.authorize(password, email);
 
       if (!data) {
@@ -99,9 +120,16 @@ function App() {
         localStorage.setItem('token', data.token);
         setIsLoggedIn(true);
       }
+
+    } catch (err) {
+      setIsInfoTooltipOpen(true);
+
+      setTooltipContent({
+        title: 'Что-то пошло не так! Попробуйте ещё раз.',
+        src: regFailure
+      });
     }
     finally {
-      setLoginSubmitButtonText('Войти');
       setLoading(false);
     }
 
@@ -111,23 +139,40 @@ function App() {
 
     try {
 
-      setRegisterSubmitButtonText('Регистрация...')
+      setLoading(true);
+
       const data = await auth.register(password, email);
 
       if (!data) {
         throw new Error('Ошибка аутентификации');
       }
 
+      setTooltipContent({
+        title: 'Вы успешно зарегистрировались!',
+        src: regSuccess
+      });
+
+    } catch (err) {
+
+      setTooltipContent({
+        title: 'Что-то пошло не так! Попробуйте ещё раз.',
+        src: regFailure
+      });
+
     }
     finally {
       setLoading(false);
-      setRegisterSubmitButtonText('Зарегистрироваться');
+      setIsInfoTooltipOpen(true);
     }
+
   }, [])
 
   const tokenCheck = React.useCallback(async function () {
 
     try {
+
+      setLoading(true);
+
 
       const token = localStorage.getItem('token');
 
@@ -143,8 +188,10 @@ function App() {
 
     } catch (err) {
       console.error(err);
+
     } finally {
       setLoading(false);
+      setIsAuthorizing(false);
     }
   }, [])
 
@@ -214,7 +261,7 @@ function App() {
 
     try {
 
-      setEditProfilePopupSubmitButtonText('Сохранение...');
+      setLoading(true);
 
       const newUserInfo = await api.editUserInfo(name, about);
 
@@ -223,10 +270,10 @@ function App() {
       closeAllPopups();
 
     } catch (err) {
-      throw new Error(err);
+      console.log(err);
 
     } finally {
-      setEditProfilePopupSubmitButtonText('Сохранить')
+      setLoading(false);
     }
   }, [closeAllPopups])
 
@@ -234,7 +281,7 @@ function App() {
 
     try {
 
-      setEditAvatarPopupSubmitButtonText('Сохранение...');
+      setLoading(true);
 
       const newUserInfo = await api.updateAvatar(avatar);
 
@@ -243,10 +290,10 @@ function App() {
       closeAllPopups();
 
     } catch (err) {
-      throw new Error(err);
+      console.log(err);
 
     } finally {
-      setEditAvatarPopupSubmitButtonText('Сохранить')
+      setLoading(false);
     }
 
   }, [closeAllPopups])
@@ -255,7 +302,7 @@ function App() {
 
     try {
 
-      setAddPlacePopupSubmitButtonText('Создание...');
+      setLoading(true);
 
       const newCard = await api.postNewCard({ name, link });
 
@@ -264,15 +311,17 @@ function App() {
       closeAllPopups();
 
     } catch (err) {
-      throw new Error(err);
+      console.log(err);
 
     } finally {
-      setAddPlacePopupSubmitButtonText('Создать');
+      setLoading(false);
     }
 
   }, [cards, closeAllPopups])
 
   const handleDeleteConfirmation = React.useCallback(function (card) {
+
+    setLoading(true);
 
     api.deleteCard(card._id)
       .then(() => {
@@ -287,11 +336,11 @@ function App() {
         console.log(err);
       })
       .finally(() => {
-        setConfirmationPopupSubmitButtonText('Да')
+        setLoading(false);
       });
   }, [closeAllPopups])
 
-  if (loading) {
+  if (isAuthorizing) {
     return (
       <Loading />
     )
@@ -334,11 +383,11 @@ function App() {
                   />
 
                   <Route path="/sign-in" element={
-                    <Login setUserData={setUserData} onRender={setCurrentPath} onLogin={login} buttonText={loginSubmitButtonText} />
+                    <Login setUserData={setUserData} onRender={setCurrentPath} onLogin={login} buttonText={loading ? 'Вход...' : 'Вход'} />
                   } />
 
                   <Route path="/sign-up" element={
-                    <Register onRender={setCurrentPath} onRegister={register} buttonText={registerSubmitButtonText} />
+                    <Register onRender={setCurrentPath} onRegister={register} buttonText={loading ? 'Регистрация...' : 'Зарегистрироваться'} />
                   } />
 
                 </Routes>
@@ -349,27 +398,27 @@ function App() {
                   isOpen={isEditProfilePopupOpen}
                   onClose={closeAllPopups}
                   onUpdateUser={handleUpdateUser}
-                  buttonText={editProfilePopupSubmitButtonText}
+                  buttonText={loading ? 'Сохранение...' : 'Сохранить'}
                 />
 
                 <EditAvatarPopup
                   isOpen={isEditAvatarPopupOpen}
                   onClose={closeAllPopups}
                   onUpdateAvatar={handleUpdateAvatar}
-                  buttonText={editAvatarPopupSubmitButtonText}
+                  buttonText={loading ? 'Сохранение...' : 'Сохранить'}
                 />
                 <AddPlacePopup
                   isOpen={isAddPlacePopupOpen}
                   onClose={closeAllPopups}
                   onAddPlace={handleAddPlaceSubmit}
-                  buttonText={addPlacePopupSubmitButtonText}
+                  buttonText={loading ? 'Создание...' : 'Создать'}
                 />
 
                 <ConfirmationPopup
                   isOpen={isConfirmationPopupOpen}
                   onClose={closeAllPopups}
                   onDeleteConfirmation={handleDeleteConfirmation}
-                  buttonText={confirmationPopupSubmitButtonText}
+                  buttonText={loading ? 'Удаление...' : 'Да'}
                 />
 
                 <ImagePopup
@@ -377,6 +426,9 @@ function App() {
                   onClose={closeAllPopups}
                   card={selectedCard}
                 />
+
+                <InfoTooltip isOpen={isInfoTooltipOpen} tooltipContent={tooltipContent} onOpen={setIsInfoTooltipOpen} onClose={setTooltipContent} />
+
               </div>
 
             </div>

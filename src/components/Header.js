@@ -29,7 +29,6 @@ function Header({
 			)
 		}
 
-
 		if (path === "/sign-up") {
 
 			return (

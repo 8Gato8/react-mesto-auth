@@ -1,10 +1,6 @@
 import React from "react";
 import { NavLink, Navigate } from "react-router-dom";
 import { IsLoggedInContext } from "../contexts/IsLoggedInContext";
-import InfoTooltip from "./InfoTooltip";
-
-import regSuccess from '../images/regSuccess.jpg';
-import regFailure from '../images/regFailure.jpg';
 
 function Register({
 	onRender,
@@ -17,8 +13,6 @@ function Register({
 	}, [onRender])
 
 	const isLoggedIn = React.useContext(IsLoggedInContext);
-	const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
-	const [tooltipContent, setTooltipContent] = React.useState({ title: '', src: '' });
 
 	const [formValues, setFormValues] = React.useState({
 		email: '',
@@ -38,34 +32,15 @@ function Register({
 
 	async function handleSubmit(e) {
 
-		try {
 
-			e.preventDefault();
+		e.preventDefault();
 
-			await onRegister(formValues);
+		await onRegister(formValues);
 
-			setFormValues({
-				email: '',
-				password: ''
-			});
-
-			setTooltipContent({
-				title: 'Вы успешно зарегистрировались!',
-				src: regSuccess
-			});
-
-			setIsInfoTooltipOpen(true);
-
-		} catch (err) {
-
-			setTooltipContent({
-				title: 'Что-то пошло не так! Попробуйте ещё раз.',
-				src: regFailure
-			});
-
-			setIsInfoTooltipOpen(true);
-
-		}
+		setFormValues({
+			email: '',
+			password: ''
+		});
 
 	}
 
@@ -127,8 +102,6 @@ function Register({
 				<p className="auth-form__to-sign-in">Уже зарегистрированы? <NavLink className="auth-form__to-sign-in-link" to="/sign-in">Войти</NavLink></p>
 
 			</div>
-
-			<InfoTooltip isOpen={isInfoTooltipOpen} tooltipContent={tooltipContent} onOpen={setIsInfoTooltipOpen} onClose={setTooltipContent} />
 		</>
 	)
 }
