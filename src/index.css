@@ -7,12 +7,18 @@
 
 @import url(./blocks/page/page.css);
 @import url(./blocks/page/__container/page__container.css);
+@import url(./blocks/loading/loading.css);
+@import url(./blocks/loading/__title/loading__title.css);
 @import url(./blocks/close-button/close-button.css);
 
 /*header*/
 
 @import url(./blocks/page/__header/page__header.css);
 @import url(./blocks/header/__logo/header__logo.css);
+@import url(./blocks/nav/nav.css);
+@import url(./blocks/nav/__item/nav__item.css);
+@import url(./blocks/nav/__user-info/nav__user-info.css);
+@import url(./blocks/nav/__logout/nav__logout.css);
 
 /*content*/
 
@@ -64,15 +70,24 @@
 @import url(./blocks/popup/_type/_card-review/popup_type_card-review.css);
 @import url(./blocks/form/form.css);
 @import url(./blocks/popup/__form/popup__form.css);
+@import url(./blocks/auth-container/auth-container.css);
+@import url(./blocks/auth-form/auth-form.css);
+@import url(./blocks/auth-form/__to-sign-in/auth-form__to-sign-in.css);
+@import url(./blocks/auth-form/__to-sign-in-link/auth-form__to-sign-in-link.css);
 @import url(./blocks/form/__title/form__title.css);
+@import url(./blocks/form/__title/_theme/form__title_theme_dark.css);
 @import url(./blocks/form/__input/form__input.css);
+@import url(./blocks/form/__input/_theme/form__input_theme_dark.css);
 @import url(./blocks/form/__input/_type/form__input_type_error.css);
 @import url(./blocks/form/__input-error/_visible/form__input-error_visible.css);
 @import url(./blocks/form/__fieldset/form__fieldset.css);
 @import url(./blocks/form/__field/form__field.css);
 @import url(./blocks/form/__submit-button/form__submit-button.css);
+@import url(./blocks/form/__submit-button/_theme/form__submit-button_theme_dark.css);
 @import url(./blocks/form/__submit-button/_disabled/form__submit-button_disabled.css);
 
+@import url(./blocks/tooltip/tooltip.css);
+@import url(./blocks/tooltip/__title/tooltip__title.css);
 
 @import url(./blocks/confirmation-title/confirmation-title.css);
 @import url(./blocks/confirmation-button/confirmation-button.css);

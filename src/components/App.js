@@ -2,10 +2,19 @@ import React from 'react';
 
 import '../index.css';
 
+import { Routes, Route, Navigate } from 'react-router-dom';
 import api from '../utils/api';
+import * as auth from "../utils/auth";
 
+import { IsLoggedInContext } from '../contexts/IsLoggedInContext';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
+import { UserDataContext } from '../contexts/UserDataContext';
 import { SelectedCardContext } from '../contexts/SelectedCardContext';
+
+import Loading from './Loading';
+import ProtectedRoute from './ProtectedRoute';
+import Register from './Register';
+import Login from './Login';
 
 import Header from './Header';
 import Main from './Main';
@@ -22,6 +31,12 @@ import { checkIfCardIsLiked } from '../utils/constants';
 
 function App() {
 
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [userData, setUserData] = React.useState({ email: '', password: '' })
+  const [loading, setLoading] = React.useState(true);
+
+  const [currentPath, setCurrentPath] = React.useState();
+
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
@@ -34,10 +49,17 @@ function App() {
 
   const [cards, setCards] = React.useState([]);
 
+  const [registerSubmitButtonText, setRegisterSubmitButtonText] = React.useState('Зарегистрироваться');
+  const [loginSubmitButtonText, setLoginSubmitButtonText] = React.useState('Войти');
   const [editProfilePopupSubmitButtonText, setEditProfilePopupSubmitButtonText] = React.useState('Сохранить');
   const [editAvatarPopupSubmitButtonText, setEditAvatarPopupSubmitButtonText] = React.useState('Сохранить');
   const [addPlacePopupSubmitButtonText, setAddPlacePopupSubmitButtonText] = React.useState('Создать');
   const [confirmationPopupSubmitButtonText, setConfirmationPopupSubmitButtonText] = React.useState('Да');
+
+  React.useEffect(() => {
+
+    tokenCheck();
+  }, [])
 
   React.useEffect(() => {
 
@@ -62,35 +84,109 @@ function App() {
       });
   }, [])
 
-  function handleEditAvatarClick() {
+  const login = React.useCallback(async function ({ password, email }) {
+
+    try {
+
+      setLoginSubmitButtonText('Вход...')
+      const data = await auth.authorize(password, email);
+
+      if (!data) {
+        throw new Error('Ошибка аутентификации');
+      }
+
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        setIsLoggedIn(true);
+      }
+    }
+    finally {
+      setLoginSubmitButtonText('Войти');
+      setLoading(false);
+    }
+
+  }, [])
+
+  const register = React.useCallback(async function ({ password, email }) {
+
+    try {
+
+      setRegisterSubmitButtonText('Регистрация...')
+      const data = await auth.register(password, email);
+
+      if (!data) {
+        throw new Error('Ошибка аутентификации');
+      }
+
+    }
+    finally {
+      setLoading(false);
+      setRegisterSubmitButtonText('Зарегистрироваться');
+    }
+  }, [])
+
+  const tokenCheck = React.useCallback(async function () {
+
+    try {
+
+      const token = localStorage.getItem('token');
+
+      const response = token ? await auth.checkToken(token) : null;
+
+      const data = response?.data;
+
+      if (data) {
+
+        setIsLoggedIn(true);
+        setUserData(data);
+      }
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [])
+
+  const logout = React.useCallback(function () {
+
+    setIsLoggedIn(false);
+    setUserData({ email: '', password: '' });
+    localStorage.removeItem('token');
+  }, [])
+
+  const handleEditAvatarClick = React.useCallback(function () {
 
     setIsEditAvatarPopupOpen(true);
-  }
+  }, [])
 
-  function handleEditProfileClick() {
+  const handleEditProfileClick = React.useCallback(function () {
 
     setIsEditProfilePopupOpen(true)
-  }
+  }, [])
 
-  function handleAddPlaceClick() {
+  const handleAddPlaceClick = React.useCallback(function () {
 
     setIsAddPlacePopupOpen(true);
-  }
+  }, [])
 
-  function handleCardClick(card) {
+  const handleCardClick = React.useCallback(async function (card) {
 
-    new Promise(resolve => resolve(setSelectedCard(card)))
-      .then(() => setIsImagePopupOpen(true));
+    await new Promise(resolve => resolve(setSelectedCard(card)));
 
-  }
+    setIsImagePopupOpen(true);
 
-  function handleDeleteClick(card) {
+  }, [])
 
-    new Promise(resolve => resolve(setSelectedCard(card)))
-      .then(() => setIsConfirmationPopupOpen(true));
-  }
+  const handleDeleteClick = React.useCallback(async function (card) {
 
-  function handleCardLike(card) {
+    await new Promise(resolve => resolve(setSelectedCard(card)));
+
+    setIsConfirmationPopupOpen(true);
+
+  }, [])
+
+  const handleCardLike = React.useCallback(function (card) {
 
     ((checkIfCardIsLiked(card, currentUser) === true) ? api.deleteLike(card._id) : api.likeCard(card._id))
       .then((newCard) => {
@@ -101,9 +197,9 @@ function App() {
       .catch((err) => {
         console.log(err);
       });
-  }
+  }, [])
 
-  function closeAllPopups() {
+  const closeAllPopups = React.useCallback(function () {
 
     setIsEditAvatarPopupOpen(false);
     setIsEditProfilePopupOpen(false);
@@ -112,68 +208,71 @@ function App() {
     setIsImagePopupOpen(false);
 
     setSelectedCard({ title: '', name: '', link: '' });
-  }
+  }, [])
 
-  function handleUpdateUser({ name, about }) {
+  const handleUpdateUser = React.useCallback(async function ({ name, about }) {
 
-    setEditProfilePopupSubmitButtonText('Сохранение...');
+    try {
 
-    api.editUserInfo(name, about)
-      .then((newUserInfo) => {
-        setCurrentUser(newUserInfo);
-      })
-      .then(() => {
-        closeAllPopups();
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
-        setEditProfilePopupSubmitButtonText('Сохранить')
-      });
-  }
+      setEditProfilePopupSubmitButtonText('Сохранение...');
 
-  function handleUpdateAvatar({ avatar }) {
+      const newUserInfo = await api.editUserInfo(name, about);
 
-    setEditAvatarPopupSubmitButtonText('Сохранение...')
+      setCurrentUser(newUserInfo);
 
-    api.updateAvatar(avatar)
-      .then((newUserInfo) => {
-        setCurrentUser(newUserInfo);
-      })
-      .then(() => {
-        closeAllPopups();
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
-        setEditAvatarPopupSubmitButtonText('Сохранить')
-      });
-  }
+      closeAllPopups();
 
-  function handleAddPlaceSubmit({ name, link }) {
+    } catch (err) {
+      throw new Error(err);
 
-    setAddPlacePopupSubmitButtonText('Создание...')
+    } finally {
+      setEditProfilePopupSubmitButtonText('Сохранить')
+    }
+  }, [])
 
-    api.postNewCard({ name, link })
-      .then((newCard) => {
-        setCards([newCard, ...cards]);
-      })
-      .then(() => {
-        closeAllPopups();
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
-        setAddPlacePopupSubmitButtonText('Создать')
-      });
-  }
+  const handleUpdateAvatar = React.useCallback(async function ({ avatar }) {
 
-  function handleDeleteConfirmation(card) {
+    try {
 
-    setConfirmationPopupSubmitButtonText('Удаление...');
+      setEditAvatarPopupSubmitButtonText('Сохранение...');
+
+      const newUserInfo = await api.updateAvatar(avatar);
+
+      setCurrentUser(newUserInfo);
+
+      closeAllPopups();
+
+    } catch (err) {
+      throw new Error(err);
+
+    } finally {
+      setEditAvatarPopupSubmitButtonText('Сохранить')
+    }
+
+  }, [])
+
+  const handleAddPlaceSubmit = React.useCallback(async function ({ name, link }) {
+
+    try {
+
+      setAddPlacePopupSubmitButtonText('Создание...');
+
+      const newCard = await api.postNewCard({ name, link });
+
+      setCards([newCard, ...cards]);
+
+      closeAllPopups();
+
+    } catch (err) {
+      throw new Error(err);
+
+    } finally {
+      setAddPlacePopupSubmitButtonText('Создать');
+    }
+
+  }, [cards])
+
+  const handleDeleteConfirmation = React.useCallback(function (card) {
 
     api.deleteCard(card._id)
       .then(() => {
@@ -190,6 +289,12 @@ function App() {
       .finally(() => {
         setConfirmationPopupSubmitButtonText('Да')
       });
+  }, [])
+
+  if (loading) {
+    return (
+      <Loading />
+    )
   }
 
   return (
@@ -198,63 +303,91 @@ function App() {
 
       <SelectedCardContext.Provider value={selectedCard}>
 
-        <div className="page">
+        <IsLoggedInContext.Provider value={isLoggedIn}>
 
-          <div className="page__container">
+          <UserDataContext.Provider value={userData}>
 
-            <Header />
+            <div className="page">
 
-            <Main
-              onEditAvatar={handleEditAvatarClick}
-              onEditProfile={handleEditProfileClick}
-              onAddPlace={handleAddPlaceClick}
-              onDeleteClick={handleDeleteClick}
-              onCardClick={handleCardClick}
-              onCardLike={handleCardLike}
-              cards={cards}
-            />
+              <div className="page__container">
 
-            <Footer />
+                <Header onLogout={logout} navPath={currentPath} />
 
-            <EditProfilePopup
-              isOpen={isEditProfilePopupOpen}
-              onClose={closeAllPopups}
-              onUpdateUser={handleUpdateUser}
-              buttonText={editProfilePopupSubmitButtonText}
-            />
+                <Routes>
 
-            <EditAvatarPopup
-              isOpen={isEditAvatarPopupOpen}
-              onClose={closeAllPopups}
-              onUpdateAvatar={handleUpdateAvatar}
-              buttonText={editAvatarPopupSubmitButtonText}
-            />
+                  <Route path="/react-mesto-auth" element={<Navigate to="/" replace />} />
 
-            <AddPlacePopup
-              isOpen={isAddPlacePopupOpen}
-              onClose={closeAllPopups}
-              onAddPlace={handleAddPlaceSubmit}
-              buttonText={addPlacePopupSubmitButtonText}
-            />
+                  <Route path="/"
+                    element={
+                      <ProtectedRoute
+                        element={Main}
+                        onRender={setCurrentPath}
+                        onEditAvatar={handleEditAvatarClick}
+                        onEditProfile={handleEditProfileClick}
+                        onAddPlace={handleAddPlaceClick}
+                        onDeleteClick={handleDeleteClick}
+                        onCardClick={handleCardClick}
+                        onCardLike={handleCardLike}
+                        cards={cards}
+                      />
+                    }
+                  />
 
-            <ConfirmationPopup
-              isOpen={isConfirmationPopupOpen}
-              onClose={closeAllPopups}
-              onDeleteConfirmation={handleDeleteConfirmation}
-              buttonText={confirmationPopupSubmitButtonText}
-            />
+                  <Route path="/sign-in" element={
+                    <Login setUserData={setUserData} onRender={setCurrentPath} onLogin={login} buttonText={loginSubmitButtonText} />
+                  } />
 
-            <ImagePopup
-              isOpen={isImagePopupOpen}
-              onClose={closeAllPopups}
-              card={selectedCard}
-            />
+                  <Route path="/sign-up" element={
+                    <Register onRender={setCurrentPath} onRegister={register} buttonText={registerSubmitButtonText} />
+                  } />
 
-          </div>
-        </div>
+                </Routes>
+
+                <Footer />
+
+                <EditProfilePopup
+                  isOpen={isEditProfilePopupOpen}
+                  onClose={closeAllPopups}
+                  onUpdateUser={handleUpdateUser}
+                  buttonText={editProfilePopupSubmitButtonText}
+                />
+
+                <EditAvatarPopup
+                  isOpen={isEditAvatarPopupOpen}
+                  onClose={closeAllPopups}
+                  onUpdateAvatar={handleUpdateAvatar}
+                  buttonText={editAvatarPopupSubmitButtonText}
+                />
+                <AddPlacePopup
+                  isOpen={isAddPlacePopupOpen}
+                  onClose={closeAllPopups}
+                  onAddPlace={handleAddPlaceSubmit}
+                  buttonText={addPlacePopupSubmitButtonText}
+                />
+
+                <ConfirmationPopup
+                  isOpen={isConfirmationPopupOpen}
+                  onClose={closeAllPopups}
+                  onDeleteConfirmation={handleDeleteConfirmation}
+                  buttonText={confirmationPopupSubmitButtonText}
+                />
+
+                <ImagePopup
+                  isOpen={isImagePopupOpen}
+                  onClose={closeAllPopups}
+                  card={selectedCard}
+                />
+              </div>
+
+            </div>
+
+          </UserDataContext.Provider>
+
+        </IsLoggedInContext.Provider>
 
       </SelectedCardContext.Provider>
-    </CurrentUserContext.Provider>
+
+    </CurrentUserContext.Provider >
   );
 }
 

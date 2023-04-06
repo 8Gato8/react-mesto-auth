@@ -1,0 +1,14 @@
+.auth-form {
+	border-radius: 10px;
+	box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.15);
+	min-width: 358px;
+	min-height: 350px;
+	box-sizing: border-box;
+	margin: auto;
+}
+
+@media (max-width: 598px) {
+	.auth-form {
+		min-width: 260px;
+	}
+}

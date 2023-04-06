@@ -1,0 +1,15 @@
+.nav {
+	display: flex;
+	align-items: center;
+	column-gap: 25px;
+	font-family: 'Inter', Helvetica, sans-serif;
+	font-size: 18px;
+}
+
+@media (max-width: 530px) {
+	.nav {
+		flex-direction: column;
+		column-gap: 0;
+		row-gap: 18px;
+	}
+}

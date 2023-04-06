@@ -88,6 +88,7 @@ function EditProfilePopup({
 				</label>
 
 			</fieldset>
+
 		</PopupWithForm>
 	)
 }

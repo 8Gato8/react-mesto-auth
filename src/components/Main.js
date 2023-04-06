@@ -4,7 +4,6 @@ import Card from './Card';
 
 
 function Main({
-
 	onEditAvatar,
 	onEditProfile,
 	onAddPlace,
