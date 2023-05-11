@@ -68,7 +68,7 @@ function App() {
       }
     }
 
-    if (isOpen) { // навешиваем только при открытии
+    if (isOpen) {
       document.addEventListener('keydown', closeByEscape);
       return () => {
         document.removeEventListener('keydown', closeByEscape);

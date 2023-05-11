@@ -22,13 +22,6 @@ export class Api {
     })
   }
 
-  getInitialCards() {
-
-    return this._request(`${this._baseUrl}/cards`, {
-      headers: this._headers,
-    })
-  }
-
   editUserInfo(newName, newJob) {
 
     return this._request(`${this._baseUrl}/users/me`, {
@@ -38,6 +31,24 @@ export class Api {
         name: newName,
         about: newJob
       })
+    })
+  }
+
+  updateAvatar(avatar) {
+
+    return this._request(`${this._baseUrl}/users/me/avatar`, {
+      method: 'PATCH',
+      headers: this._headers,
+      body: JSON.stringify({
+        avatar,
+      })
+    })
+  }
+
+  getInitialCards() {
+
+    return this._request(`${this._baseUrl}/cards`, {
+      headers: this._headers,
     })
   }
 
@@ -77,16 +88,6 @@ export class Api {
     })
   }
 
-  updateAvatar(avatar) {
-
-    return this._request(`${this._baseUrl}/users/me/avatar`, {
-      method: 'PATCH',
-      headers: this._headers,
-      body: JSON.stringify({
-        avatar,
-      })
-    })
-  }
 }
 
 const api = new Api({
