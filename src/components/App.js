@@ -2,7 +2,7 @@ import React from 'react';
 
 import '../index.css';
 
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import api from '../utils/api';
 import * as auth from "../utils/auth";
 
@@ -363,8 +363,6 @@ function App() {
                 <Header onLogout={logout} navPath={currentPath} />
 
                 <Routes>
-
-                  <Route path="/react-mesto-auth" element={<Navigate to="/" replace />} />
 
                   <Route path="/"
                     element={

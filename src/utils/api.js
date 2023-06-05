@@ -91,7 +91,7 @@ export class Api {
 }
 
 const api = new Api({
-  baseUrl: 'https://api.gato.students.nomoredomains.rocks',
+  baseUrl: 'api.gato.students.nomoredomains.rocks',
   headers: {
     authorization: 'ca43c8e8-a5c6-4257-ad6d-b3b634fe42f7',
     'Content-Type': 'application/json'
