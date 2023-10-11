@@ -2,7 +2,7 @@
 
 Проект представляет собой интерактивную страницу с карточками фотографий, выполненную на React.
 
-## [Демонстрация сайта](https://8gato8.github.io/mesto-react-auth)
+## [Демонстрация сайта](https://8gato8.github.io/mesto-react-auth/)
 
 ![Превью проекта](./src/images/mesto-auth.jpg)
 
