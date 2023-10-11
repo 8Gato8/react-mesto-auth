@@ -6,21 +6,6 @@
 
 ![Превью проекта](./src/images/mesto-auth.jpg)
 
-**Использованы следующие методы и технологии:**
-
-- HTML
-- CSS
-- Flexbox layout
-- [Методология BEM](https://ru.bem.info/methodology/ "Использована классическая схема организации файловой структуры БЭМ-проектов: Nested")
-- Grid layout
-- Media queries
-- Figma
-- JavaScript
-- React
-- React Router
-- JSON
-- Webpack
-
 **Функционал:**
 
 Пользователь может 
@@ -35,6 +20,21 @@
 Также реализованы
 - регистрация
 - авторизация
+
+**Использованы следующие методы и технологии:**
+
+- HTML
+- CSS
+- Flexbox layout
+- [Методология BEM](https://ru.bem.info/methodology/ "Использована классическая схема организации файловой структуры БЭМ-проектов: Nested")
+- Grid layout
+- Media queries
+- Figma
+- JavaScript
+- React
+- React Router
+- JSON
+- Webpack
 
 **Взаимодействие с backend**
 
