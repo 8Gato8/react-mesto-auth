@@ -4,7 +4,15 @@
 
 ## [Демонстрация сайта](https://8gato8.github.io/react-mesto-auth/)
 
-![Превью проекта](./src/images/mesto-auth.jpg)
+</br>
+
+<div align="center">
+  <img src="./src/images/mesto-auth.jpg">
+</div>
+
+</br>
+
+![Превью проекта]()
 
 **Функционал:**
 
